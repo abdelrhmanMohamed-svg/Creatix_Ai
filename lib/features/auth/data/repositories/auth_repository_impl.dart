@@ -22,6 +22,8 @@ class AuthRepositoryImpl implements AuthRepository {
         password: password,
       );
       return Right(user);
+    } on AuthFailure catch (e) {
+      return Left(AuthFailure(message: e.message));
     } catch (e) {
       return Left(AuthFailure(message: _networkErrorMessage));
     }
@@ -38,6 +40,8 @@ class AuthRepositoryImpl implements AuthRepository {
         password: password,
       );
       return Right(user);
+    } on AuthFailure catch (e) {
+      return Left(AuthFailure(message: e.message));
     } catch (e) {
       return Left(AuthFailure(message: _networkErrorMessage));
     }

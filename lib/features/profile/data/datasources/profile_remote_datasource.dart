@@ -1,5 +1,7 @@
 import 'package:supabase_flutter/supabase_flutter.dart' as sb;
 import '../../domain/entities/profile.dart';
+import '../../../../core/constants/database_constants.dart';
+import '../../../../core/error/failures.dart';
 
 abstract class ProfileRemoteDatasource {
   Future<Profile> getProfile(String userId);
@@ -17,33 +19,37 @@ class ProfileRemoteDatasourceImpl implements ProfileRemoteDatasource {
 
   @override
   Future<Profile> getProfile(String userId) async {
-    final response = await _client
-        .from('profiles')
-        .select()
-        .eq('user_id', userId)
-        .maybeSingle();
+    try {
+      final response = await _client
+          .from(DatabaseConstants.profilesTable)
+          .select()
+          .eq('user_id', userId)
+          .maybeSingle();
 
-    if (response == null) {
+      if (response == null) {
+        return Profile(
+          id: '',
+          userId: userId,
+          fullName: null,
+          avatarUrl: null,
+        );
+      }
+
       return Profile(
-        id: '',
-        userId: userId,
-        fullName: null,
-        avatarUrl: null,
+        id: response['id']?.toString() ?? '',
+        userId: response['user_id']?.toString() ?? userId,
+        fullName: response['full_name'] as String?,
+        avatarUrl: response['avatar_url'] as String?,
+        createdAt: response['created_at'] != null
+            ? DateTime.tryParse(response['created_at'].toString())
+            : null,
+        updatedAt: response['updated_at'] != null
+            ? DateTime.tryParse(response['updated_at'].toString())
+            : null,
       );
+    } catch (e) {
+      throw AuthFailure(message: 'Failed to load profile');
     }
-
-    return Profile(
-      id: response['id'] ?? '',
-      userId: response['user_id'] ?? userId,
-      fullName: response['full_name'],
-      avatarUrl: response['avatar_url'],
-      createdAt: response['created_at'] != null
-          ? DateTime.tryParse(response['created_at'])
-          : null,
-      updatedAt: response['updated_at'] != null
-          ? DateTime.tryParse(response['updated_at'])
-          : null,
-    );
   }
 
   @override
@@ -52,25 +58,29 @@ class ProfileRemoteDatasourceImpl implements ProfileRemoteDatasource {
     String? fullName,
     String? avatarUrl,
   }) async {
-    final updates = <String, dynamic>{};
-    if (fullName != null) updates['full_name'] = fullName;
-    if (avatarUrl != null) updates['avatar_url'] = avatarUrl;
-    updates['updated_at'] = DateTime.now().toIso8601String();
+    try {
+      final updates = <String, dynamic>{};
+      if (fullName != null) updates['full_name'] = fullName;
+      if (avatarUrl != null) updates['avatar_url'] = avatarUrl;
+      updates['updated_at'] = DateTime.now().toIso8601String();
 
-    final response = await _client
-        .from('profiles')
-        .upsert({
-          'user_id': userId,
-          ...updates,
-        }, onConflict: 'user_id')
-        .select()
-        .maybeSingle();
+      final response = await _client
+          .from(DatabaseConstants.profilesTable)
+          .upsert({
+            'user_id': userId,
+            ...updates,
+          }, onConflict: 'user_id')
+          .select()
+          .maybeSingle();
 
-    return Profile(
-      id: response?['id'] ?? '',
-      userId: userId,
-      fullName: fullName,
-      avatarUrl: avatarUrl,
-    );
+      return Profile(
+        id: response?['id']?.toString() ?? '',
+        userId: userId,
+        fullName: fullName,
+        avatarUrl: avatarUrl,
+      );
+    } catch (e) {
+      throw AuthFailure(message: 'Failed to update profile');
+    }
   }
 }

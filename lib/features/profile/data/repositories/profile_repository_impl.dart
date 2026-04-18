@@ -16,6 +16,8 @@ class ProfileRepositoryImpl implements ProfileRepository {
     try {
       final profile = await _remoteDatasource.getProfile(userId);
       return Right(profile);
+    } on AuthFailure catch (e) {
+      return Left(AuthFailure(message: e.message));
     } catch (e) {
       return Left(CacheFailure(message: _networkErrorMessage));
     }
@@ -34,6 +36,8 @@ class ProfileRepositoryImpl implements ProfileRepository {
         avatarUrl: avatarUrl,
       );
       return Right(profile);
+    } on AuthFailure catch (e) {
+      return Left(AuthFailure(message: e.message));
     } catch (e) {
       return Left(CacheFailure(message: _networkErrorMessage));
     }

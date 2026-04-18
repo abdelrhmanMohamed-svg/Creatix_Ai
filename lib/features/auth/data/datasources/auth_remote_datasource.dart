@@ -1,5 +1,6 @@
 import 'package:supabase_flutter/supabase_flutter.dart' as sb;
 import '../../domain/entities/user.dart';
+import '../../../../core/error/failures.dart';
 
 abstract class AuthRemoteDatasource {
   Future<AppUser> register({required String email, required String password});
@@ -9,8 +10,6 @@ abstract class AuthRemoteDatasource {
   Future<void> logout();
 
   Future<AppUser?> getCurrentUser();
-
-  Stream<AppUser?> get authStateChanges;
 }
 
 class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
@@ -23,22 +22,28 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
     required String email,
     required String password,
   }) async {
-    final response = await _client.auth.signUp(
-      email: email,
-      password: password,
-    );
+    try {
+      final response = await _client.auth.signUp(
+        email: email,
+        password: password,
+      );
 
-    if (response.user == null) {
-      throw Exception('Registration failed');
+      if (response.user == null) {
+        throw AuthFailure(message: 'Registration failed. Please try again.');
+      }
+
+      return AppUser(
+        id: response.user!.id,
+        email: response.user!.email ?? email,
+        createdAt: response.user!.createdAt,
+        updatedAt: response.user!.updatedAt,
+        emailConfirmedAt: response.user!.emailConfirmedAt,
+      );
+    } on sb.AuthException catch (e) {
+      throw AuthFailure(message: e.message);
+    } catch (e) {
+      throw AuthFailure(message: 'An unexpected error occurred');
     }
-
-    return AppUser(
-      id: response.user!.id,
-      email: response.user!.email ?? email,
-      createdAt: response.user!.createdAt,
-      updatedAt: response.user!.updatedAt,
-      emailConfirmedAt: response.user!.emailConfirmedAt,
-    );
   }
 
   @override
@@ -46,22 +51,28 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
     required String email,
     required String password,
   }) async {
-    final response = await _client.auth.signInWithPassword(
-      email: email,
-      password: password,
-    );
+    try {
+      final response = await _client.auth.signInWithPassword(
+        email: email,
+        password: password,
+      );
 
-    if (response.user == null) {
-      throw Exception('Login failed');
+      if (response.user == null) {
+        throw AuthFailure(message: 'Invalid email or password.');
+      }
+
+      return AppUser(
+        id: response.user!.id,
+        email: response.user!.email ?? email,
+        createdAt: response.user!.createdAt,
+        updatedAt: response.user!.updatedAt,
+        emailConfirmedAt: response.user!.emailConfirmedAt,
+      );
+    } on sb.AuthException catch (e) {
+      throw AuthFailure(message: e.message);
+    } catch (e) {
+      throw AuthFailure(message: 'An unexpected error occurred');
     }
-
-    return AppUser(
-      id: response.user!.id,
-      email: response.user!.email ?? email,
-      createdAt: response.user!.createdAt,
-      updatedAt: response.user!.updatedAt,
-      emailConfirmedAt: response.user!.emailConfirmedAt,
-    );
   }
 
   @override
@@ -82,21 +93,5 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
       updatedAt: user.updatedAt,
       emailConfirmedAt: user.emailConfirmedAt,
     );
-  }
-
-  Stream<AppUser?> get authStateChanges {
-    return _client.auth.onAuthStateChange.asyncMap((data) async {
-      if (data.event == sb.AuthChangeEvent.signedIn && data.session != null) {
-        final user = data.session!.user;
-        return AppUser(
-          id: user.id,
-          email: user.email ?? '',
-          createdAt: user.createdAt,
-          updatedAt: user.updatedAt,
-          emailConfirmedAt: user.emailConfirmedAt,
-        );
-      }
-      return null;
-    });
   }
 }
