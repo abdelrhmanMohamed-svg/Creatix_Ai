@@ -12,6 +12,16 @@ import 'package:creatix/features/profile/domain/repositories/profile_repository.
 import 'package:creatix/features/profile/domain/usecases/get_profile.dart';
 import 'package:creatix/features/profile/domain/usecases/update_profile.dart';
 import 'package:creatix/features/profile/presentation/cubit/profile_cubit.dart';
+import 'package:creatix/features/brands/data/datasources/brand_remote_data_source.dart';
+import 'package:creatix/features/brands/data/repositories/brand_repository_impl.dart';
+import 'package:creatix/features/brands/data/repositories/brand_storage_repository_impl.dart';
+import 'package:creatix/features/brands/domain/repositories/brand_repository.dart';
+import 'package:creatix/features/brands/domain/repositories/brand_storage_repository.dart';
+import 'package:creatix/features/brands/domain/usecases/get_brands.dart';
+import 'package:creatix/features/brands/domain/usecases/create_brand.dart';
+import 'package:creatix/features/brands/domain/usecases/update_brand.dart';
+import 'package:creatix/features/brands/domain/usecases/delete_brand.dart';
+import 'package:creatix/features/brands/domain/usecases/upload_brand_logo.dart';
 import 'package:get_it/get_it.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -56,10 +66,37 @@ Future<void> setupDependencies() async {
     () => UpdateProfile(getIt<ProfileRepository>()),
   );
 
-  getIt.registerFactory<ProfileCubit>(
+  getIt.registerLazySingleton<ProfileCubit>(
     () => ProfileCubit(
       getProfile: getIt<GetProfile>(),
       updateProfile: getIt<UpdateProfile>(),
     ),
+  );
+
+  getIt.registerLazySingleton<BrandRemoteDataSource>(
+    () => BrandRemoteDataSourceImpl(getIt<SupabaseClient>()),
+  );
+  getIt.registerLazySingleton<BrandRepository>(
+    () => BrandRepositoryImpl(getIt<BrandRemoteDataSource>()),
+  );
+
+  getIt.registerLazySingleton<BrandStorageRepository>(
+    () => BrandStorageRepositoryImpl(getIt<SupabaseClient>()),
+  );
+
+  getIt.registerFactory<GetBrands>(
+    () => GetBrands(getIt<BrandRepository>()),
+  );
+  getIt.registerFactory<CreateBrand>(
+    () => CreateBrand(getIt<BrandRepository>()),
+  );
+  getIt.registerFactory<UpdateBrand>(
+    () => UpdateBrand(getIt<BrandRepository>()),
+  );
+  getIt.registerFactory<DeleteBrand>(
+    () => DeleteBrand(getIt<BrandRepository>()),
+  );
+  getIt.registerFactory<UploadBrandLogo>(
+    () => UploadBrandLogo(getIt<BrandStorageRepository>()),
   );
 }
