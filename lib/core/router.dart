@@ -1,43 +1,49 @@
+import 'package:creatix/features/brands/presentation/pages/brands_page.dart';
+import 'package:creatix/features/brands/presentation/pages/create_brand_page.dart';
+import 'package:creatix/features/brands/presentation/pages/update_brand_page.dart';
 import 'package:flutter/material.dart';
 import 'constants/app_routes.dart';
-import '../features/home/presentation/pages/home_page.dart';
 import '../features/auth/presentation/pages/login_page.dart';
 import '../features/auth/presentation/pages/register_page.dart';
 import '../features/profile/presentation/pages/profile_page.dart';
 import '../features/profile/presentation/pages/edit_profile_page.dart';
 import '../features/profile/domain/entities/profile.dart';
+import '../features/profile/presentation/cubit/profile_cubit.dart';
 import 'presentation/pages/not_found_page.dart';
 
 class AppRouter {
   static Route<dynamic> generateRoute(RouteSettings settings) {
     switch (settings.name) {
-      case AppRoutes.home:
+      case AppRoutes.brands:
+        return MaterialPageRoute(builder: (_) => const BrandsPage());
+      case AppRoutes.createBrand:
+        return MaterialPageRoute(builder: (_) => const CreateBrandPage());
+      case AppRoutes.updateBrand:
+        final args = settings.arguments as Map<String, dynamic>?;
         return MaterialPageRoute(
-          builder: (_) => const HomePage(),
+          builder: (_) => UpdateBrandPage(
+            brandId: args?['brandId'] ?? '',
+            initialName: args?['initialName'] ?? '',
+            initialLogoUrl: args?['initialLogoUrl'],
+          ),
         );
       case AppRoutes.login:
-        return MaterialPageRoute(
-          builder: (_) => const LoginPage(),
-        );
+        return MaterialPageRoute(builder: (_) => const LoginPage());
       case AppRoutes.register:
-        return MaterialPageRoute(
-          builder: (_) => const RegisterPage(),
-        );
+        return MaterialPageRoute(builder: (_) => const RegisterPage());
       case AppRoutes.profile:
         final userId = settings.arguments as String;
-        return MaterialPageRoute(
-          builder: (_) => ProfilePage(userId: userId),
-        );
+        return MaterialPageRoute(builder: (_) => ProfilePage(userId: userId));
       case AppRoutes.editProfile:
-        final profile = settings.arguments as Profile;
+        final args = settings.arguments as Map<String, dynamic>;
+        final profile = args['profile'] as Profile;
+        final cubit = args['cubit'] as ProfileCubit;
         return MaterialPageRoute(
-          builder: (_) => EditProfilePage(profile: profile),
+          builder: (_) => EditProfilePage(profile: profile, cubit: cubit),
         );
-      
+
       default:
-        return MaterialPageRoute(
-          builder: (_) => const NotFoundPage(),
-        );
+        return MaterialPageRoute(builder: (_) => const NotFoundPage());
     }
   }
 }

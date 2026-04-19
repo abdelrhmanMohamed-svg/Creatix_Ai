@@ -26,4 +26,18 @@ class Validators {
     }
     return null;
   }
+
+  static String? brandName(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Brand name is required';
+    }
+    if (value.length < 1 || value.length > 100) {
+      return 'Brand name must be between 1 and 100 characters';
+    }
+    final brandNameRegex = RegExp(r'^[a-zA-Z0-9\s\-_]+$');
+    if (!brandNameRegex.hasMatch(value)) {
+      return 'Only letters, numbers, spaces, hyphens, and underscores are allowed';
+    }
+    return null;
+  }
 }

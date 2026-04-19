@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:creatix/core/constants/app_routes.dart';
+import 'package:creatix/core/di/injection.dart';
 import '../cubit/profile_cubit.dart';
 import '../cubit/profile_state.dart';
 
@@ -12,7 +13,7 @@ class ProfilePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => context.read<ProfileCubit>()..loadProfile(userId),
+      create: (context) => getIt<ProfileCubit>()..loadProfile(userId),
       child: Scaffold(
         appBar: AppBar(
           title: const Text('Profile'),
@@ -26,7 +27,10 @@ class ProfilePage extends StatelessWidget {
                       Navigator.pushNamed(
                         context,
                         AppRoutes.editProfile,
-                        arguments: state.profile,
+                        arguments: {
+                          'profile': state.profile,
+                          'cubit': getIt<ProfileCubit>(),
+                        },
                       );
                     },
                   );
@@ -47,7 +51,11 @@ class ProfilePage extends StatelessWidget {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Icon(Icons.error_outline, size: 48, color: Colors.red),
+                    const Icon(
+                      Icons.error_outline,
+                      size: 48,
+                      color: Colors.red,
+                    ),
                     const SizedBox(height: 16),
                     Text(state.message),
                     const SizedBox(height: 16),
@@ -85,8 +93,10 @@ class ProfilePage extends StatelessWidget {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            _buildInfoRow('Full Name',
-                                profile.fullName ?? 'Not set'),
+                            _buildInfoRow(
+                              'Full Name',
+                              profile.fullName ?? 'Not set',
+                            ),
                             const Divider(),
                             _buildInfoRow('Email', 'View from auth'),
                             const Divider(),
