@@ -1,8 +1,11 @@
 ﻿# Creatix Development Guidelines
 
-Auto-generated from all feature plans. Last updated: 2026-04-18
+Auto-generated from all feature plans. Last updated: 2026-04-19
 
 ## Active Technologies
+- Flutter + Dart 3.x + flutter_bloc (Cubit), get_it, supabase_flutter, equatable, dartz (002-auth-profile)
+- Supabase Database (profiles table) + Supabase Auth (002-auth-profile)
+- Supabase (PostgreSQL) for brands table (003-brands-system)
 
 - Dart 3.x (latest stable Flutter SDK) + Flutter, flutter_bloc (Cubit), get_it, supabase_flutter, equatable, dartz (001-foundation-setup-core)
 
@@ -22,6 +25,8 @@ tests/
 Dart 3.x (latest stable Flutter SDK): Follow standard conventions
 
 ## Recent Changes
+- 003-brands-system: Added Dart 3.x (latest stable Flutter SDK) + Flutter, flutter_bloc (Cubit), get_it, supabase_flutter, equatable, dartz
+- 002-auth-profile: Added Flutter + Dart 3.x + flutter_bloc (Cubit), get_it, supabase_flutter, equatable, dartz
 
 - 001-foundation-setup-core: Added Dart 3.x (latest stable Flutter SDK) + Flutter, flutter_bloc (Cubit), get_it, supabase_flutter, equatable, dartz
 
