@@ -22,15 +22,17 @@
 
 ## [Category 1]
 
-- [ ] CHK001 First checklist item with clear action
-- [ ] CHK002 Second checklist item
-- [ ] CHK003 Third checklist item
+- [ ] CHK001 Validate Clean Architecture separation (Data/Domain/Presentation layers)
+- [ ] CHK002 Validate Cubit-only state management (no direct setState, Provider, etc.)
+- [ ] CHK003 Validate get_it dependency injection usage
 
 ## [Category 2]
 
-- [ ] CHK004 Another category item
-- [ ] CHK005 Item with specific criteria
-- [ ] CHK006 Final item in this category
+- [ ] CHK004 Validate Supabase backend integration (auth, db, storage, edge functions)
+- [ ] CHK005 Validate no external AI API calls from Flutter code
+- [ ] CHK006 Validate provider system implementation (user keys + fallback)
+- [ ] CHK007 Validate API key security (no client exposure)
+- [ ] CHK008 Validate feature-based structure enforcement
 
 ## Notes
 

@@ -1,50 +1,51 @@
-# [PROJECT_NAME] Constitution
-<!-- Example: Spec Constitution, TaskFlow Constitution, etc. -->
+<!-- Sync Impact Report:
+- Version change: 1.0.0 (initial version based on template)
+- Modified principles: All principles updated to reflect Flutter/Supabase/Cubit/get_it requirements
+- Added sections: Technical Constraints, Development Practices, Governance
+- Removed sections: None (template sections retained but renamed)
+- Templates requiring updates:
+  ✅ .specify/templates/plan-template.md (Constitution Check added)
+  ✅ .specify/templates/spec-template.md (Functional Requirements updated)
+  ✅ .specify/templates/tasks-template.md (Foundational phase validation tasks added)
+  ✅ .specify/templates/checklist-template.md (Constitution validation checklist added)
+- Follow-up TODOs: RATIFICATION_DATE needs to be determined
+-->
+
+# Creatix Constitution
 
 ## Core Principles
 
-### [PRINCIPLE_1_NAME]
-<!-- Example: I. Library-First -->
-[PRINCIPLE_1_DESCRIPTION]
-<!-- Example: Every feature starts as a standalone library; Libraries must be self-contained, independently testable, documented; Clear purpose required - no organizational-only libraries -->
+### I. Clean Architecture
+MUST follow Clean Architecture with strict separation: Data layer (models, datasources, repositories), Domain layer (entities, usecases, repository contracts), Presentation layer (UI, Cubits, states). NO mixing of responsibilities between layers.
 
-### [PRINCIPLE_2_NAME]
-<!-- Example: II. CLI Interface -->
-[PRINCIPLE_2_DESCRIPTION]
-<!-- Example: Every library exposes functionality via CLI; Text in/out protocol: stdin/args → stdout, errors → stderr; Support JSON + human-readable formats -->
+### II. State Management
+MUST use Cubit (Bloc) for state management ONLY. NO direct setState, NO Provider, NO Riverpod, NO Redux. State changes MUST happen through Cubit methods.
 
-### [PRINCIPLE_3_NAME]
-<!-- Example: III. Test-First (NON-NEGOTIABLE) -->
-[PRINCIPLE_3_DESCRIPTION]
-<!-- Example: TDD mandatory: Tests written → User approved → Tests fail → Then implement; Red-Green-Refactor cycle strictly enforced -->
+### III. Dependency Injection
+MUST use get_it for dependency injection. ALL dependencies MUST be registered through get_it. NO manual instantiation, NO ServiceLocator anti-patterns, NO inheritance for DI.
 
-### [PRINCIPLE_4_NAME]
-<!-- Example: IV. Integration Testing -->
-[PRINCIPLE_4_DESCRIPTION]
-<!-- Example: Focus areas requiring integration tests: New library contract tests, Contract changes, Inter-service communication, Shared schemas -->
+### IV. Backend Integration
+MUST use Supabase for ALL backend functionality (auth, database, storage, edge functions). MUST NEVER call external AI APIs (OpenAI, Gemini, etc.) from Flutter code. ALL external API calls MUST go through Supabase edge functions. API keys MUST be stored ONLY in Supabase Vault/edge function environment.
 
-### [PRINCIPLE_5_NAME]
-<!-- Example: V. Observability, VI. Versioning & Breaking Changes, VII. Simplicity -->
-[PRINCIPLE_5_DESCRIPTION]
-<!-- Example: Text I/O ensures debuggability; Structured logging required; Or: MAJOR.MINOR.BUILD format; Or: Start simple, YAGNI principles -->
+### V. Provider System & Security
+MUST support provider system with user API keys (OpenAI, Gemini) and fallback default provider (Pixazo). API keys MUST be kept secure - NO exposure in client code, NO hardcoding, NO logging. Provider resolution MUST happen in edge functions. Feature-based structure MUST be enforced with clear separation between features.
 
-## [SECTION_2_NAME]
-<!-- Example: Additional Constraints, Security Requirements, Performance Standards, etc. -->
+## Technical Constraints
+- MUST use Flutter + Dart as specified in implementation plan
+- MUST follow the project structure outlined in docs/flutter_implementaion_plan.md
+- MUST implement features in phases as outlined: Foundation, Auth+Profile, Brands, Brand Kit, Provider Keys, Generation, History
+- MUST enable Row Level Security (RLS) matching backend plan
+- MUST implement proper error handling and loading states in all Cubits
 
-[SECTION_2_CONTENT]
-<!-- Example: Technology stack requirements, compliance standards, deployment policies, etc. -->
-
-## [SECTION_3_NAME]
-<!-- Example: Development Workflow, Review Process, Quality Gates, etc. -->
-
-[SECTION_3_CONTENT]
-<!-- Example: Code review requirements, testing gates, deployment approval process, etc. -->
+## Development Practices
+- MUST write unit tests for all usecases and repository implementations
+- MUST write widget tests for all UI components
+- MUST conduct code reviews for all changes
+- MUST keep commits atomic and focused
+- MUST update documentation when changing architecture or APIs
+- MUST follow Dart formatting standards (dartfmt)
 
 ## Governance
-<!-- Example: Constitution supersedes all other practices; Amendments require documentation, approval, migration plan -->
+This constitution supersedes all other documentation and practices. Amendments MUST be documented with rationale, approved by maintainers, and include a migration plan if breaking changes are introduced. All PRs/reviews MUST verify compliance with this constitution. Complexity MUST be justified with clear benefits. Use docs/flutter_implementaion_plan.md for runtime development guidance.
 
-[GOVERNANCE_RULES]
-<!-- Example: All PRs/reviews must verify compliance; Complexity must be justified; Use [GUIDANCE_FILE] for runtime development guidance -->
-
-**Version**: [CONSTITUTION_VERSION] | **Ratified**: [RATIFICATION_DATE] | **Last Amended**: [LAST_AMENDED_DATE]
-<!-- Example: Version: 2.1.1 | Ratified: 2025-06-13 | Last Amended: 2025-07-16 -->
+**Version**: 1.0.0 | **Ratified**: TODO(RATIFICATION_DATE): Original adoption date unknown | **Last Amended**: 2026-04-18

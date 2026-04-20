@@ -31,7 +31,14 @@
 
 *GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
 
-[Gates determined based on constitution file]
+- MUST follow Clean Architecture (Data/Domain/Presentation layers)
+- MUST use Cubit for state management only
+- MUST use get_it for dependency injection
+- MUST use Supabase for backend (auth, db, storage, edge functions)
+- MUST NEVER call external AI APIs from Flutter (use edge functions)
+- MUST support provider system with user API keys and fallback default provider
+- MUST keep API keys secure (no exposure in client)
+- MUST enforce feature-based structure
 
 ## Project Structure
 

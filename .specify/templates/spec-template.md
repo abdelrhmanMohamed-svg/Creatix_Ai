@@ -84,11 +84,19 @@
 
 ### Functional Requirements
 
-- **FR-001**: System MUST [specific capability, e.g., "allow users to create accounts"]
-- **FR-002**: System MUST [specific capability, e.g., "validate email addresses"]  
-- **FR-003**: Users MUST be able to [key interaction, e.g., "reset their password"]
-- **FR-004**: System MUST [data requirement, e.g., "persist user preferences"]
-- **FR-005**: System MUST [behavior, e.g., "log all security events"]
+- **FR-001**: System MUST follow Clean Architecture with separate Data, Domain, and Presentation layers
+- **FR-002**: System MUST use Cubit for state management only
+- **FR-003**: System MUST use get_it for dependency injection
+- **FR-004**: System MUST use Supabase for all backend functionality (auth, db, storage, edge functions)
+- **FR-005**: System MUST NEVER call external AI APIs from Flutter code (use edge functions instead)
+- **FR-006**: System MUST support provider system with user API keys (OpenAI, Gemini) and fallback default provider (Pixazo)
+- **FR-007**: System MUST keep API keys secure (no exposure in client code)
+- **FR-008**: System MUST enforce feature-based structure with clear separation between features
+- **FR-009**: System MUST [specific capability, e.g., "allow users to create accounts"]
+- **FR-010**: System MUST [specific capability, e.g., "validate email addresses"]  
+- **FR-011**: Users MUST be able to [key interaction, e.g., "reset their password"]
+- **FR-012**: System MUST [data requirement, e.g., "persist user preferences"]
+- **FR-013**: System MUST [behavior, e.g., "log all security events"]
 
 *Example of marking unclear requirements:*
 

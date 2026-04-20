@@ -156,11 +156,7 @@ class BrandCubit extends Cubit<BrandState> {
         }
       }
 
-      final createResult = await createBrandUseCase(
-        userId: userId,
-        name: currentState.name.trim(),
-        logoUrl: logoUrl,
-      );
+   
 
       debugPrint('Brand created successfully');
 

@@ -22,6 +22,9 @@ import 'package:creatix/features/brands/domain/usecases/create_brand.dart';
 import 'package:creatix/features/brands/domain/usecases/update_brand.dart';
 import 'package:creatix/features/brands/domain/usecases/delete_brand.dart';
 import 'package:creatix/features/brands/domain/usecases/upload_brand_logo.dart';
+import 'package:creatix/features/brand_kit_wizard/data/datasources/brand_kit_remote_data_source.dart';
+import 'package:creatix/features/brand_kit_wizard/data/repositories/brand_kit_repository_impl.dart';
+import 'package:creatix/features/brand_kit_wizard/domain/repositories/brand_kit_repository.dart';
 import 'package:get_it/get_it.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -98,5 +101,12 @@ Future<void> setupDependencies() async {
   );
   getIt.registerFactory<UploadBrandLogo>(
     () => UploadBrandLogo(getIt<BrandStorageRepository>()),
+  );
+
+  getIt.registerLazySingleton<BrandKitRemoteDataSource>(
+    () => BrandKitRemoteDataSourceImpl(getIt<SupabaseClient>()),
+  );
+  getIt.registerLazySingleton<BrandKitRepository>(
+    () => BrandKitRepositoryImpl(getIt<BrandKitRemoteDataSource>()),
   );
 }

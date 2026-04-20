@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
-import 'package:creatix/core/supabase/supabase_client.dart';
 import '../../domain/usecases/get_brands.dart';
 import '../../domain/usecases/create_brand.dart';
 import '../../domain/usecases/update_brand.dart';
