@@ -1,6 +1,7 @@
 import 'package:creatix/features/brands/presentation/pages/brands_page.dart';
 import 'package:creatix/features/brands/presentation/pages/create_brand_page.dart';
 import 'package:creatix/features/brands/presentation/pages/update_brand_page.dart';
+import 'package:creatix/features/brand_kit_wizard/presentation/pages/brand_kit_wizard_page.dart';
 import 'package:flutter/material.dart';
 import 'constants/app_routes.dart';
 import '../features/auth/presentation/pages/login_page.dart';
@@ -40,6 +41,13 @@ class AppRouter {
         final cubit = args['cubit'] as ProfileCubit;
         return MaterialPageRoute(
           builder: (_) => EditProfilePage(profile: profile, cubit: cubit),
+        );
+      case AppRoutes.brandKitWizard:
+        final args = settings.arguments as Map<String, dynamic>?;
+        return MaterialPageRoute(
+          builder: (_) => BrandKitWizardPage(
+            brandId: args?['brandId'] ?? '',
+          ),
         );
 
       default:

@@ -8,6 +8,7 @@ class AppRoutes {
   static const String notFound = '/404';
   static const String createBrand = '/create-brand';
   static const String updateBrand = '/update-brand';
+  static const String brandKitWizard = '/brand-kit-wizard';
 
   static const List<String> _routes = [
     brands,
@@ -19,6 +20,7 @@ class AppRoutes {
     notFound,
     createBrand,
     updateBrand,
+    brandKitWizard,
   ];
 
   static bool isValidRoute(String route) => _routes.contains(route);
