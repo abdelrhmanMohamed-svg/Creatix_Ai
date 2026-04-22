@@ -77,7 +77,13 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
 
   @override
   Future<void> logout() async {
-    await _client.auth.signOut();
+    try {
+      await _client.auth.signOut();
+    } on sb.AuthException catch (e) {
+      throw AuthFailure(message: e.message);
+    } catch (e) {
+      throw AuthFailure(message: 'An unexpected error occurred during logout');
+    }
   }
 
   @override

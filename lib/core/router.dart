@@ -3,7 +3,9 @@ import 'package:creatix/features/brands/presentation/pages/create_brand_page.dar
 import 'package:creatix/features/brands/presentation/pages/update_brand_page.dart';
 import 'package:creatix/features/brand_kit_wizard/presentation/pages/brand_kit_wizard_page.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'constants/app_routes.dart';
+import 'di/injection.dart';
 import '../features/auth/presentation/pages/login_page.dart';
 import '../features/auth/presentation/pages/register_page.dart';
 import '../features/profile/presentation/pages/profile_page.dart';
@@ -21,11 +23,14 @@ class AppRouter {
         return MaterialPageRoute(builder: (_) => const CreateBrandPage());
       case AppRoutes.updateBrand:
         final args = settings.arguments as Map<String, dynamic>?;
+        if (args == null || args['brandId'] == null) {
+          return MaterialPageRoute(builder: (_) => const NotFoundPage());
+        }
         return MaterialPageRoute(
           builder: (_) => UpdateBrandPage(
-            brandId: args?['brandId'] ?? '',
-            initialName: args?['initialName'] ?? '',
-            initialLogoUrl: args?['initialLogoUrl'],
+            brandId: args['brandId'] as String? ?? '',
+            initialName: args['initialName'] as String? ?? '',
+            initialLogoUrl: args['initialLogoUrl'] as String?,
           ),
         );
       case AppRoutes.login:
@@ -33,20 +38,31 @@ class AppRouter {
       case AppRoutes.register:
         return MaterialPageRoute(builder: (_) => const RegisterPage());
       case AppRoutes.profile:
-        final userId = settings.arguments as String;
+        final userId = settings.arguments as String?;
+        if (userId == null || userId.isEmpty) {
+          return MaterialPageRoute(builder: (_) => const NotFoundPage());
+        }
         return MaterialPageRoute(builder: (_) => ProfilePage(userId: userId));
       case AppRoutes.editProfile:
-        final args = settings.arguments as Map<String, dynamic>;
+        final args = settings.arguments as Map<String, dynamic>?;
+        if (args == null || args['profile'] == null) {
+          return MaterialPageRoute(builder: (_) => const NotFoundPage());
+        }
         final profile = args['profile'] as Profile;
-        final cubit = args['cubit'] as ProfileCubit;
         return MaterialPageRoute(
-          builder: (_) => EditProfilePage(profile: profile, cubit: cubit),
+          builder: (_) => BlocProvider(
+            create: (_) => getIt<ProfileCubit>(),
+            child: EditProfilePage(profile: profile),
+          ),
         );
       case AppRoutes.brandKitWizard:
         final args = settings.arguments as Map<String, dynamic>?;
+        if (args == null || args['brandId'] == null) {
+          return MaterialPageRoute(builder: (_) => const NotFoundPage());
+        }
         return MaterialPageRoute(
           builder: (_) => BrandKitWizardPage(
-            brandId: args?['brandId'] ?? '',
+            brandId: args['brandId'] as String? ?? '',
           ),
         );
 

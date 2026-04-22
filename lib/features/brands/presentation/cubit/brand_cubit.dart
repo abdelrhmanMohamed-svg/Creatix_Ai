@@ -133,6 +133,7 @@ class BrandCubit extends Cubit<BrandState> {
       debugPrint('User ID: $userId');
       if (userId == null) {
         emit(currentState.copyWith(isSubmitting: false));
+        emit(const BrandError('User not authenticated'));
         return;
       }
 
@@ -156,9 +157,23 @@ class BrandCubit extends Cubit<BrandState> {
         }
       }
 
-   
+      final brandResult = await createBrandUseCase(
+        userId: userId,
+        name: currentState.name.trim(),
+        logoUrl: logoUrl,
+      );
 
-      debugPrint('Brand created successfully');
+      brandResult.fold(
+        (failure) {
+          debugPrint('Brand creation failed: ${failure.message}');
+          emit(currentState.copyWith(isSubmitting: false));
+          emit(BrandError(failure.message));
+          return;
+        },
+        (brand) {
+          debugPrint('Brand created successfully with ID: ${brand.id}');
+        },
+      );
 
       final brandsResult = await getBrandsUseCase(userId);
       brandsResult.fold(
@@ -226,7 +241,11 @@ class BrandCubit extends Cubit<BrandState> {
       );
 
       final userId = _currentUserId;
-      final result = await getBrandsUseCase(userId ?? '');
+      if (userId == null) {
+        emit(const BrandError('User not authenticated'));
+        return;
+      }
+      final result = await getBrandsUseCase(userId);
       result.fold(
         (failure) => emit(BrandError(failure.message)),
         (brands) => emit(BrandLoaded(brands)),
@@ -280,7 +299,11 @@ class BrandCubit extends Cubit<BrandState> {
       },
       (_) async {
         final userId = _currentUserId;
-        final brandsResult = await getBrandsUseCase(userId ?? '');
+        if (userId == null) {
+          emit(const BrandError('User not authenticated'));
+          return;
+        }
+        final brandsResult = await getBrandsUseCase(userId);
         brandsResult.fold(
           (failure) => emit(BrandError(failure.message)),
           (brands) {

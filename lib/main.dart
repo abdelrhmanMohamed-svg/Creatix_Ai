@@ -14,7 +14,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   await dotenv.load();
-  await SupabaseClientWrapper.initialize();
+  await SupabaseClientWrapper().initialize();
 
   await setupDependencies();
 
@@ -27,11 +27,11 @@ class CreatixApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => getIt<AuthCubit>()..checkAuth(),
+      create: (_) => getIt<AuthCubit>()..checkAuth(),
       child: BlocBuilder<AuthCubit, AuthState>(
-        builder: (context, state) {
-          final isAuthenticated = state is AuthAuthenticated;
+        bloc: getIt<AuthCubit>(),
 
+        builder: (context, state) {
           return MaterialApp(
             title: AppConstants.appName,
             debugShowCheckedModeBanner: false,
@@ -39,11 +39,13 @@ class CreatixApp extends StatelessWidget {
               colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
               useMaterial3: true,
             ),
-            initialRoute: isAuthenticated ? AppRoutes.brands : AppRoutes.login,
+            initialRoute: state is AuthAuthenticated
+                ? AppRoutes.brands
+                : AppRoutes.login,
             onGenerateRoute: AppRouter.generateRoute,
           );
         },
       ),
     );
   }
-} 
+}

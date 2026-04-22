@@ -1,17 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:creatix/core/di/injection.dart';
 import '../../domain/entities/profile.dart';
 import '../cubit/profile_cubit.dart';
 import '../cubit/profile_state.dart';
 
 class EditProfilePage extends StatefulWidget {
   final Profile profile;
-  final ProfileCubit cubit;
+  final ProfileCubit? cubit;
 
   const EditProfilePage({
     super.key,
     required this.profile,
-    required this.cubit,
+    this.cubit,
   });
 
   @override
@@ -22,12 +23,14 @@ class _EditProfilePageState extends State<EditProfilePage> {
   final _formKey = GlobalKey<FormState>();
   late final TextEditingController _fullNameController;
   late final TextEditingController _avatarUrlController;
+  late final ProfileCubit _cubit;
 
   @override
   void initState() {
     super.initState();
     _fullNameController = TextEditingController(text: widget.profile.fullName);
     _avatarUrlController = TextEditingController(text: widget.profile.avatarUrl);
+    _cubit = widget.cubit ?? getIt<ProfileCubit>();
   }
 
   @override
@@ -39,7 +42,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
   void _onSave() {
     if (_formKey.currentState!.validate()) {
-      widget.cubit.updateProfile(
+      _cubit.updateProfile(
         fullName: _fullNameController.text.trim().isEmpty
             ? null
             : _fullNameController.text.trim(),
@@ -53,7 +56,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
   @override
   Widget build(BuildContext context) {
     return BlocProvider.value(
-      value: widget.cubit,
+      value: _cubit,
       child: BlocListener<ProfileCubit, ProfileState>(
         listener: (context, state) {
           if (state is ProfileLoaded) {

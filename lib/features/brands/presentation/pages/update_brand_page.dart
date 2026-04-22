@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:creatix/core/di/injection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
@@ -14,7 +15,6 @@ import '../../domain/usecases/upload_brand_logo.dart';
 import '../cubit/brand_cubit.dart';
 import '../cubit/brand_state.dart';
 
-final sl = GetIt.instance;
 
 class UpdateBrandPage extends StatelessWidget {
   final String brandId;
@@ -33,11 +33,11 @@ class UpdateBrandPage extends StatelessWidget {
     return BlocProvider(
       create: (context) {
         final cubit = BrandCubit(
-          getBrandsUseCase: sl<GetBrands>(),
-          createBrandUseCase: sl<CreateBrand>(),
-          updateBrandUseCase: sl<UpdateBrand>(),
-          deleteBrandUseCase: sl<DeleteBrand>(),
-          uploadBrandLogoUseCase: sl<UploadBrandLogo>(),
+          getBrandsUseCase: getIt<GetBrands>(),
+          createBrandUseCase: getIt<CreateBrand>(),
+          updateBrandUseCase: getIt<UpdateBrand>(),
+          deleteBrandUseCase: getIt<DeleteBrand>(),
+          uploadBrandLogoUseCase: getIt<UploadBrandLogo>(),
         );
         cubit.initUpdateBrandForm(brandId: brandId, name: initialName, logoUrl: initialLogoUrl);
         return cubit;
@@ -103,97 +103,147 @@ class _BrandDetailsTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<BrandCubit, BrandState>(
-      builder: (context, state) {
-        if (state is! UpdateBrandFormState) {
-          return const Center(child: CircularProgressIndicator());
+    return BlocListener<BrandCubit, BrandState>(
+      listener: (context, state) {
+        if (state is BrandLoaded || state is BrandEmpty) {
+          Navigator.pop(context, true);
+        } else if (state is BrandError) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(state.error ?? 'Failed to update brand')),
+          );
         }
-
-        final logoUrl = state.logoUrl;
-
-        return SingleChildScrollView(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              GestureDetector(
-                onTap: () => context.read<BrandCubit>().pickLogoForUpdate(),
-                child: Container(
-                  height: 150,
-                  decoration: BoxDecoration(
-                    color: Colors.grey[200],
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: Colors.grey[300]!),
-                  ),
-                  child: logoUrl != null && logoUrl.isNotEmpty
-                      ? Stack(
-                          fit: StackFit.expand,
-                          children: [
-                            ClipRRect(
-                              borderRadius: BorderRadius.circular(12),
-                              child: logoUrl.startsWith('/')
-                                  ? Image.file(File(logoUrl), fit: BoxFit.cover)
-                                  : Image.network(logoUrl, fit: BoxFit.cover),
-                            ),
-                            Positioned(
-                              top: 4,
-                              right: 4,
-                              child: IconButton(
-                                icon: const Icon(Icons.close, color: Colors.white),
-                                onPressed: () => context.read<BrandCubit>().removeLogoForUpdate(),
-                              ),
-                            ),
-                          ],
-                        )
-                      : Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(Icons.add_photo_alternate, size: 48, color: Colors.grey[400]),
-                            const SizedBox(height: 8),
-                            Text('Tap to change logo', style: TextStyle(color: Colors.grey[600])),
-                          ],
-                        ),
-                ),
-              ),
-              const SizedBox(height: 24),
-              TextFormField(
-                initialValue: state.name,
-                decoration: InputDecoration(
-                  labelText: 'Brand Name',
-                  hintText: 'Enter brand name',
-                  errorText: state.nameError,
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                ),
-                onChanged: (value) => context.read<BrandCubit>().onUpdateBrandNameChanged(value),
-              ),
-              const SizedBox(height: 32),
-              SizedBox(
-                height: 50,
-                child: ElevatedButton(
-                  onPressed: state.isSubmitting
-                      ? null
-                      : () {
-                          debugPrint('Submitting update brand: ${state.name}');
-                          context.read<BrandCubit>().submitUpdateBrand();
-                        },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Theme.of(context).primaryColor,
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                  ),
-                  child: state.isSubmitting
-                      ? const SizedBox(
-                          height: 20,
-                          width: 20,
-                          child: CircularProgressIndicator(strokeWidth: 2, valueColor: AlwaysStoppedAnimation(Colors.white)),
-                        )
-                      : const Text('Update Brand'),
-                ),
-              ),
-            ],
-          ),
-        );
       },
+      child: BlocBuilder<BrandCubit, BrandState>(
+        builder: (context, state) {
+          if (state is! UpdateBrandFormState) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          final logoUrl = state.logoUrl;
+
+          return SingleChildScrollView(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                GestureDetector(
+                  onTap: () => context.read<BrandCubit>().pickLogoForUpdate(),
+                  child: Container(
+                    height: 150,
+                    decoration: BoxDecoration(
+                      color: Colors.grey[200],
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: Colors.grey[300]!),
+                    ),
+                    child: logoUrl != null && logoUrl.isNotEmpty
+                        ? Stack(
+                            fit: StackFit.expand,
+                            children: [
+                              ClipRRect(
+                                borderRadius: BorderRadius.circular(12),
+                                child: logoUrl.startsWith('/')
+                                    ? Image.file(File(logoUrl), fit: BoxFit.cover)
+                                    : Image.network(logoUrl, fit: BoxFit.cover),
+                              ),
+                              Positioned(
+                                top: 4,
+                                right: 4,
+                                child: IconButton(
+                                  icon: const Icon(Icons.close, color: Colors.white),
+                                  onPressed: () => context.read<BrandCubit>().removeLogoForUpdate(),
+                                ),
+                              ),
+                            ],
+                          )
+                        : Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(Icons.add_photo_alternate, size: 48, color: Colors.grey[400]),
+                              const SizedBox(height: 8),
+                              Text('Tap to change logo', style: TextStyle(color: Colors.grey[600])),
+                            ],
+                          ),
+                  ),
+                ),
+                const SizedBox(height: 24),
+                TextFormField(
+                  initialValue: state.name,
+                  decoration: InputDecoration(
+                    labelText: 'Brand Name',
+                    hintText: 'Enter brand name',
+                    errorText: state.nameError,
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                  ),
+                  onChanged: (value) => context.read<BrandCubit>().onUpdateBrandNameChanged(value),
+                ),
+                const SizedBox(height: 32),
+                SizedBox(
+                  height: 50,
+                  child: ElevatedButton(
+                    onPressed: state.isSubmitting
+                        ? null
+                        : () {
+                            debugPrint('Submitting update brand: ${state.name}');
+                            context.read<BrandCubit>().submitUpdateBrand();
+                          },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Theme.of(context).primaryColor,
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                    ),
+                    child: state.isSubmitting
+                        ? const SizedBox(
+                            height: 20,
+                            width: 20,
+                            child: CircularProgressIndicator(strokeWidth: 2, valueColor: AlwaysStoppedAnimation(Colors.white)),
+                          )
+                        : const Text('Update Brand'),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                SizedBox(
+                  height: 50,
+                  child: OutlinedButton(
+                    onPressed: state.isSubmitting
+                        ? null
+                        : () => _showDeleteDialog(context, brandId),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: Colors.red,
+                      side: const BorderSide(color: Colors.red),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                    ),
+                    child: const Text('Delete Brand'),
+                  ),
+                ),
+              ],
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  void _showDeleteDialog(BuildContext context, String brandId) {
+    showDialog(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Delete Brand'),
+        content: const Text('Are you sure you want to delete this brand? This action cannot be undone.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(dialogContext);
+              context.read<BrandCubit>().deleteBrand(brandId);
+            },
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            child: const Text('Delete'),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -219,7 +269,7 @@ class _BrandKitTabState extends State<_BrandKitTab> {
   }
 
   Future<void> _loadBrandKit() async {
-    final repository = sl<BrandKitRepository>();
+    final repository = getIt<BrandKitRepository>();
     final result = await repository.getBrandKitByBrandId(widget.brandId);
     
     result.fold(

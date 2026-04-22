@@ -29,7 +29,6 @@ class ProfilePage extends StatelessWidget {
                         AppRoutes.editProfile,
                         arguments: {
                           'profile': state.profile,
-                          'cubit': getIt<ProfileCubit>(),
                         },
                       );
                     },
@@ -123,11 +122,11 @@ class ProfilePage extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          SizedBox(
+           SizedBox(
             width: 100,
             child: Text(
               label,
-              style: const TextStyle(
+              style: TextStyle(
                 fontWeight: FontWeight.bold,
                 color: Colors.grey,
               ),
