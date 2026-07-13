@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:creatix/core/di/injection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
@@ -15,7 +16,6 @@ import '../../domain/usecases/upload_brand_logo.dart';
 import '../cubit/brand_cubit.dart';
 import '../cubit/brand_state.dart';
 
-final sl = GetIt.instance;
 
 class UpdateBrandPage extends StatelessWidget {
   final String brandId;
@@ -34,12 +34,12 @@ class UpdateBrandPage extends StatelessWidget {
     return BlocProvider(
       create: (context) {
         final cubit = BrandCubit(
-          getBrandsUseCase: sl<GetBrands>(),
-          createBrandUseCase: sl<CreateBrand>(),
-          updateBrandUseCase: sl<UpdateBrand>(),
-          deleteBrandUseCase: sl<DeleteBrand>(),
-          uploadBrandLogoUseCase: sl<UploadBrandLogo>(),
-          storageRepository: sl<BrandStorageRepository>(),
+          getBrandsUseCase: getIt<GetBrands>(),
+          createBrandUseCase: getIt<CreateBrand>(),
+          updateBrandUseCase: getIt<UpdateBrand>(),
+          deleteBrandUseCase: getIt<DeleteBrand>(),
+          uploadBrandLogoUseCase: getIt<UploadBrandLogo>(),
+          storageRepository: getIt<BrandStorageRepository>(),
         );
         cubit.initUpdateBrandForm(brandId: brandId, name: initialName, logoUrl: initialLogoUrl);
         return cubit;
@@ -239,7 +239,7 @@ class _BrandKitTabState extends State<_BrandKitTab> {
   }
 
   Future<void> _loadBrandKit() async {
-    final repository = sl<BrandKitRepository>();
+    final repository = getIt<BrandKitRepository>();
     final result = await repository.getBrandKitByBrandId(widget.brandId);
     
     result.fold(

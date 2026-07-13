@@ -14,7 +14,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   await dotenv.load();
-  await SupabaseClientWrapper.initialize();
+  await SupabaseClientWrapper().initialize();
 
   await setupDependencies();
 
@@ -24,13 +24,6 @@ void main() async {
 class CreatixApp extends StatelessWidget {
   const CreatixApp({super.key});
 
- 
-
-
-
-
-  
-
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
@@ -39,10 +32,9 @@ class CreatixApp extends StatelessWidget {
         listenWhen: (previous, current) =>
             previous is AuthAuthenticated && current is AuthUnauthenticated,
         listener: (context, state) {
-          Navigator.of(context).pushNamedAndRemoveUntil(
-            AppRoutes.login,
-            (_) => false,
-          );
+          Navigator.of(
+            context,
+          ).pushNamedAndRemoveUntil(AppRoutes.login, (_) => false);
         },
         child: BlocBuilder<AuthCubit, AuthState>(
           builder: (context, state) {
@@ -55,7 +47,9 @@ class CreatixApp extends StatelessWidget {
                 colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
                 useMaterial3: true,
               ),
-              initialRoute: isAuthenticated ? AppRoutes.brands : AppRoutes.login,
+              initialRoute: isAuthenticated
+                  ? AppRoutes.brands
+                  : AppRoutes.login,
               onGenerateRoute: AppRouter.generateRoute,
             );
           },
@@ -63,4 +57,4 @@ class CreatixApp extends StatelessWidget {
       ),
     );
   }
-} 
+}

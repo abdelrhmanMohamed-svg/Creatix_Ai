@@ -1,27 +1,38 @@
-import 'package:supabase_flutter/supabase_flutter.dart';
+import 'dart:async';
+
+import 'package:supabase_flutter/supabase_flutter.dart' as sb;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class SupabaseClientWrapper {
-  static SupabaseClientWrapper? _instance;
-  static SupabaseClient? _client;
+  static final SupabaseClientWrapper _instance =
+      SupabaseClientWrapper._internal();
+  factory SupabaseClientWrapper() => _instance;
 
-  SupabaseClientWrapper._();
+  SupabaseClientWrapper._internal();
 
-  static Future<void> initialize() async {
+  sb.SupabaseClient? _client;
+
+  Future<void> initialize() async {
+    if (_client != null) return;
+
     await dotenv.load();
     final url = dotenv.env['SUPABASE_URL'] ?? '';
     final anonKey = dotenv.env['SUPABASE_ANON_KEY'] ?? '';
 
-    await Supabase.initialize(
+    if (url.isEmpty || anonKey.isEmpty) {
+      throw Exception(
+          'Supabase URL or ANON_KEY is missing. Check your .env file.');
+    }
+
+    await sb.Supabase.initialize(
       url: url,
       anonKey: anonKey,
     );
 
-    _client = Supabase.instance.client;
-    _instance = SupabaseClientWrapper._();
+    _client = sb.Supabase.instance.client;
   }
 
-  static SupabaseClient get instance {
+  sb.SupabaseClient get client {
     if (_client == null) {
       throw Exception(
           'SupabaseClient not initialized. Call SupabaseClientWrapper.initialize() first.');
@@ -29,5 +40,5 @@ class SupabaseClientWrapper {
     return _client!;
   }
 
-  static bool get isInitialized => _client != null;
+  bool get isInitialized => _client != null;
 }

@@ -30,15 +30,20 @@ import 'package:creatix/features/provider_keys/data/repositories/provider_key_re
 import 'package:creatix/features/provider_keys/domain/repositories/provider_key_repository.dart';
 import 'package:creatix/features/provider_keys/presentation/cubit/provider_key_cubit.dart';
 import 'package:get_it/get_it.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:supabase_flutter/supabase_flutter.dart' as sb;
+import '../supabase/supabase_client.dart';
 
 final getIt = GetIt.instance;
 
 Future<void> setupDependencies() async {
-  getIt.registerLazySingleton<SupabaseClient>(() => Supabase.instance.client);
+  getIt.registerSingleton<SupabaseClientWrapper>(SupabaseClientWrapper());
+
+  getIt.registerLazySingleton<sb.SupabaseClient>(
+    () => getIt<SupabaseClientWrapper>().client,
+  );
 
   getIt.registerLazySingleton<AuthRemoteDatasource>(
-    () => AuthRemoteDatasourceImpl(getIt<SupabaseClient>()),
+    () => AuthRemoteDatasourceImpl(getIt<sb.SupabaseClient>()),
   );
   getIt.registerLazySingleton<AuthRepository>(
     () => AuthRepositoryImpl(getIt<AuthRemoteDatasource>()),
@@ -60,7 +65,7 @@ Future<void> setupDependencies() async {
   );
 
   getIt.registerLazySingleton<ProfileRemoteDatasource>(
-    () => ProfileRemoteDatasourceImpl(getIt<SupabaseClient>()),
+    () => ProfileRemoteDatasourceImpl(getIt<sb.SupabaseClient>()),
   );
   getIt.registerLazySingleton<ProfileRepository>(
     () => ProfileRepositoryImpl(getIt<ProfileRemoteDatasource>()),
@@ -73,7 +78,7 @@ Future<void> setupDependencies() async {
     () => UpdateProfile(getIt<ProfileRepository>()),
   );
 
-  getIt.registerLazySingleton<ProfileCubit>(
+  getIt.registerFactory<ProfileCubit>(
     () => ProfileCubit(
       getProfile: getIt<GetProfile>(),
       updateProfile: getIt<UpdateProfile>(),
@@ -81,14 +86,14 @@ Future<void> setupDependencies() async {
   );
 
   getIt.registerLazySingleton<BrandRemoteDataSource>(
-    () => BrandRemoteDataSourceImpl(getIt<SupabaseClient>()),
+    () => BrandRemoteDataSourceImpl(getIt<sb.SupabaseClient>()),
   );
   getIt.registerLazySingleton<BrandRepository>(
     () => BrandRepositoryImpl(getIt<BrandRemoteDataSource>()),
   );
 
   getIt.registerLazySingleton<BrandStorageRepository>(
-    () => BrandStorageRepositoryImpl(getIt<SupabaseClient>()),
+    () => BrandStorageRepositoryImpl(getIt<sb.SupabaseClient>()),
   );
 
   getIt.registerFactory<GetBrands>(
@@ -108,14 +113,14 @@ Future<void> setupDependencies() async {
   );
 
   getIt.registerLazySingleton<BrandKitRemoteDataSource>(
-    () => BrandKitRemoteDataSourceImpl(getIt<SupabaseClient>()),
+    () => BrandKitRemoteDataSourceImpl(getIt<sb.SupabaseClient>()),
   );
   getIt.registerLazySingleton<BrandKitRepository>(
     () => BrandKitRepositoryImpl(getIt<BrandKitRemoteDataSource>()),
   );
 
   getIt.registerLazySingleton<ProviderKeyRemoteDatasource>(
-    () => ProviderKeyRemoteDatasourceImpl(getIt<SupabaseClient>()),
+    () => ProviderKeyRemoteDatasourceImpl(getIt<sb.SupabaseClient>()),
   );
   getIt.registerLazySingleton<ProviderKeyRepository>(
     () => ProviderKeyRepositoryImpl(getIt<ProviderKeyRemoteDatasource>()),
@@ -124,7 +129,7 @@ Future<void> setupDependencies() async {
   getIt.registerFactory<ProviderKeyCubit>(
     () => ProviderKeyCubit(
       repository: getIt<ProviderKeyRepository>(),
-      supabaseClient: getIt<SupabaseClient>(),
+      supabaseClient: getIt<sb.SupabaseClient>(),
     ),
   );
 }

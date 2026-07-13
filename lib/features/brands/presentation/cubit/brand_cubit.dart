@@ -142,6 +142,7 @@ class BrandCubit extends Cubit<BrandState> {
       debugPrint('User ID: $userId');
       if (userId == null) {
         emit(currentState.copyWith(isSubmitting: false));
+        emit(const BrandError('User not authenticated'));
         return;
       }
 
@@ -181,8 +182,6 @@ class BrandCubit extends Cubit<BrandState> {
       );
 
       if (!createSuccess) return;
-
-      debugPrint('Brand created successfully');
 
       final brandsResult = await getBrandsUseCase(userId);
       brandsResult.fold(
@@ -312,7 +311,11 @@ class BrandCubit extends Cubit<BrandState> {
       },
       (_) async {
         final userId = _currentUserId;
-        final brandsResult = await getBrandsUseCase(userId ?? '');
+        if (userId == null) {
+          emit(const BrandError('User not authenticated'));
+          return;
+        }
+        final brandsResult = await getBrandsUseCase(userId);
         brandsResult.fold(
           (failure) => emit(BrandError(failure.message)),
           (brands) {

@@ -24,14 +24,15 @@ class _LoginPageState extends State<LoginPage> {
     super.dispose();
   }
 
-  void _onLogin() {
-    if (_formKey.currentState!.validate()) {
-      context.read<AuthCubit>().login(
-        email: _emailController.text.trim(),
-        password: _passwordController.text,
-      );
-    }
+void _onLogin() {
+  final formState = _formKey.currentState;
+  if (formState != null && formState.validate()) {
+    context.read<AuthCubit>().login(
+      email: _emailController.text.trim(),
+      password: _passwordController.text,
+    );
   }
+}
 
   @override
   Widget build(BuildContext context) {

@@ -37,12 +37,14 @@ class _EditProfileFormState extends State<_EditProfileForm> {
   final _formKey = GlobalKey<FormState>();
   late final TextEditingController _fullNameController;
   late final TextEditingController _avatarUrlController;
+  late final ProfileCubit _cubit;
 
   @override
   void initState() {
     super.initState();
     _fullNameController = TextEditingController(text: widget.profile.fullName);
     _avatarUrlController = TextEditingController(text: widget.profile.avatarUrl);
+    _cubit = getIt<ProfileCubit>();
   }
 
   @override
