@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../../domain/repositories/brand_storage_repository.dart';
 import '../../domain/usecases/create_brand.dart';
 import '../../domain/usecases/delete_brand.dart';
 import '../../domain/usecases/get_brands.dart';
@@ -11,6 +12,7 @@ import '../../domain/usecases/update_brand.dart';
 import '../../domain/usecases/upload_brand_logo.dart';
 import '../cubit/brand_cubit.dart';
 import '../cubit/brand_state.dart';
+import 'package:creatix/features/auth/presentation/cubit/auth_cubit.dart';
 
 final sl = GetIt.instance;
 
@@ -26,6 +28,7 @@ class BrandsPage extends StatelessWidget {
         updateBrandUseCase: sl<UpdateBrand>(),
         deleteBrandUseCase: sl<DeleteBrand>(),
         uploadBrandLogoUseCase: sl<UploadBrandLogo>(),
+        storageRepository: sl<BrandStorageRepository>(),
       )..loadBrands(),
       child: const BrandsView(),
     );
@@ -44,8 +47,28 @@ class BrandsView extends StatelessWidget {
         title: const Text('My Brands'),
         actions: [
           IconButton(
+            icon: const Icon(Icons.key),
+            tooltip: 'Provider Keys',
+            onPressed: () => Navigator.pushNamed(
+              context,
+              AppRoutes.providerKeys,
+            ),
+          ),
+          IconButton(
             icon: const Icon(Icons.person),
             onPressed: () => _navigateToProfile(context),
+          ),
+          IconButton(
+            icon: const Icon(Icons.logout),
+            tooltip: 'Logout',
+            onPressed: () {
+              context.read<AuthCubit>().logout();
+              Navigator.pushNamedAndRemoveUntil(
+                context,
+                AppRoutes.login,
+                (_) => false,
+              );
+            },
           ),
           IconButton(
             icon: const Icon(Icons.add),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:creatix/core/constants/app_routes.dart';
 import 'package:creatix/core/di/injection.dart';
 import '../cubit/profile_cubit.dart';
@@ -29,7 +30,6 @@ class ProfilePage extends StatelessWidget {
                         AppRoutes.editProfile,
                         arguments: {
                           'profile': state.profile,
-                          'cubit': getIt<ProfileCubit>(),
                         },
                       );
                     },
@@ -98,7 +98,7 @@ class ProfilePage extends StatelessWidget {
                               profile.fullName ?? 'Not set',
                             ),
                             const Divider(),
-                            _buildInfoRow('Email', 'View from auth'),
+                            _buildInfoRow('Email', Supabase.instance.client.auth.currentUser?.email ?? 'Not available'),
                             const Divider(),
                             _buildInfoRow('User ID', profile.userId),
                           ],

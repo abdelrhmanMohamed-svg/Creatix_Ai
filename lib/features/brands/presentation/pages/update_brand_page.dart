@@ -6,6 +6,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
 import 'package:creatix/core/constants/app_routes.dart';
 import 'package:creatix/features/brand_kit_wizard/domain/repositories/brand_kit_repository.dart';
+import '../../domain/repositories/brand_storage_repository.dart';
 import '../../domain/usecases/get_brands.dart';
 import '../../domain/usecases/create_brand.dart';
 import '../../domain/usecases/update_brand.dart';
@@ -38,6 +39,7 @@ class UpdateBrandPage extends StatelessWidget {
           updateBrandUseCase: sl<UpdateBrand>(),
           deleteBrandUseCase: sl<DeleteBrand>(),
           uploadBrandLogoUseCase: sl<UploadBrandLogo>(),
+          storageRepository: sl<BrandStorageRepository>(),
         );
         cubit.initUpdateBrandForm(brandId: brandId, name: initialName, logoUrl: initialLogoUrl);
         return cubit;
@@ -103,7 +105,15 @@ class _BrandDetailsTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<BrandCubit, BrandState>(
+    return BlocListener<BrandCubit, BrandState>(
+      listenWhen: (previous, current) =>
+        previous is UpdateBrandFormState &&
+        previous.isSubmitting &&
+        current is UpdateBrandFormState &&
+        !current.isSubmitting &&
+        current.submissionError == null,
+      listener: (context, state) => Navigator.pop(context, true),
+      child: BlocBuilder<BrandCubit, BrandState>(
       builder: (context, state) {
         if (state is! UpdateBrandFormState) {
           return const Center(child: CircularProgressIndicator());
@@ -116,6 +126,15 @@ class _BrandDetailsTab extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+              if (state.submissionError != null)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 16),
+                  child: Text(
+                    state.submissionError!,
+                    style: const TextStyle(color: Colors.red),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
               GestureDetector(
                 onTap: () => context.read<BrandCubit>().pickLogoForUpdate(),
                 child: Container(
@@ -194,6 +213,7 @@ class _BrandDetailsTab extends StatelessWidget {
           ),
         );
       },
+    ),
     );
   }
 }

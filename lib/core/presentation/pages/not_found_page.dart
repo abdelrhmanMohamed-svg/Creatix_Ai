@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:creatix/core/constants/app_routes.dart';
 
 class NotFoundPage extends StatelessWidget {
   const NotFoundPage({super.key});
@@ -34,7 +35,7 @@ class NotFoundPage extends StatelessWidget {
             const SizedBox(height: 24),
             ElevatedButton(
               onPressed: () {
-                Navigator.of(context).pushReplacementNamed('/home');
+                Navigator.of(context).pushReplacementNamed(AppRoutes.brands);
               },
               child: const Text('Go Home'),
             ),

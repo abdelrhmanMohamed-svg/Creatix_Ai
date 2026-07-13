@@ -55,13 +55,20 @@ class FailureHelper {
   }
 
   static Failure fromException(Object error) {
-    if (error.toString().contains('SocketException')) {
+    String errorMessage = error.toString();
+    
+    if (errorMessage.contains('SocketException')) {
       return const NetworkFailure(
           message: 'Network error occurred');
     }
-    if (error.toString().contains('AuthException')) {
+    if (errorMessage.contains('AuthException')) {
       return const AuthFailure(message: 'Authentication failed');
     }
-    return UnknownFailure(message: error.toString());
+    
+    if (errorMessage.startsWith('Exception: ')) {
+      errorMessage = errorMessage.substring(11);
+    }
+    
+    return UnknownFailure(message: errorMessage);
   }
 }

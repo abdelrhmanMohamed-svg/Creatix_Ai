@@ -19,7 +19,7 @@ class ProfileRepositoryImpl implements ProfileRepository {
     } on AuthFailure catch (e) {
       return Left(AuthFailure(message: e.message));
     } catch (e) {
-      return Left(CacheFailure(message: _networkErrorMessage));
+      return Left(ServerFailure(message: _networkErrorMessage));
     }
   }
 
@@ -39,7 +39,7 @@ class ProfileRepositoryImpl implements ProfileRepository {
     } on AuthFailure catch (e) {
       return Left(AuthFailure(message: e.message));
     } catch (e) {
-      return Left(CacheFailure(message: _networkErrorMessage));
+      return Left(ServerFailure(message: _networkErrorMessage));
     }
   }
 }

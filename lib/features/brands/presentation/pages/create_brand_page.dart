@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
+import '../../domain/repositories/brand_storage_repository.dart';
 import '../../domain/usecases/get_brands.dart';
 import '../../domain/usecases/create_brand.dart';
 import '../../domain/usecases/update_brand.dart';
@@ -25,6 +26,7 @@ class CreateBrandPage extends StatelessWidget {
         updateBrandUseCase: sl<UpdateBrand>(),
         deleteBrandUseCase: sl<DeleteBrand>(),
         uploadBrandLogoUseCase: sl<UploadBrandLogo>(),
+        storageRepository: sl<BrandStorageRepository>(),
       )..initCreateBrandForm(),
       child: const _CreateBrandView(),
     );

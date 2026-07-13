@@ -678,50 +678,298 @@ BrandKitCubit:
 
 ---
 
-# 🔑 Phase 5 — Provider Keys System
+# 🔑 Phase 5 — Provider Keys System (Production-Ready)
 
 ## 🎯 Goal
 
-Manage API keys for AI providers (OpenAI / Gemini)
+Manage AI provider API keys (**OpenAI / Gemini**) securely using **Supabase Vault**, with:
+
+* Server-side validation
+* Secure storage (no raw keys in DB)
+* Multi-provider support per user
+* Clean separation from generation logic
 
 ---
 
-## 🗄️ Table: provider_keys
+## 🧠 Scope Rules
 
-- id
-- user_id
-- provider
-- encrypted_key
-- is_active
+* Keys are owned by **USER** (not brand)
+* User can have **multiple keys**
+* Only **one active key per provider**
+* Brands may reference a specific key (optional)
+
+---
+
+## 🗄️ Database Schema
+
+### Table: `provider_keys`
+
+* `id` (uuid)
+* `user_id` (uuid)
+* `provider` (enum: `"openai" | "gemini"`)
+* `vault_secret_id` (text)
+* `is_active` (bool)
+* `status` (enum: `"valid" | "invalid" | "rate_limited"`)
+* `last_validated_at` (timestamp)
+* `created_at` (timestamp)
+
+---
+
+## 🗄️ Update: `brands`
+
+* `active_provider_key_id` (nullable)
+
+---
+
+## 🔐 Security Architecture
+
+### Rules
+
+* ❌ NEVER store raw API keys in database
+
+* ❌ NEVER expose keys to client
+
+* ❌ NEVER validate keys on frontend
+
+* ✅ Keys stored ONLY in Supabase Vault
+
+* ✅ Only Edge Functions can access Vault
+
+* ✅ Database stores ONLY `vault_secret_id`
+
+---
+
+## 🧩 Vault Abstraction Layer
+
+```ts
+class VaultService {
+  async storeKey(apiKey: string): Promise<string> {}
+  async getKey(secretId: string): Promise<string> {}
+  async deleteKey(secretId: string): Promise<void> {}
+}
+```
 
 ---
 
 ## ⚙️ Edge Functions
 
-- add-key
-- delete-key
-- rotate-key
+### 1. `add-key`
+
+#### Input
+
+```json
+{
+  "provider": "openai",
+  "key": "sk-xxxx"
+}
+```
+
+#### Flow
+
+1. Validate API key (real API call)
+2. Handle response:
+
+   * 200 → valid
+   * 401/403 → reject
+   * 429 → accept as `rate_limited`
+3. Store key in Vault
+4. Save `vault_secret_id` in DB
+5. Mark as active (optional)
+
+#### Output
+
+```json
+{
+  "status": "valid"
+}
+```
+
+---
+
+### 2. `validate-key`
+
+#### Output
+
+```json
+{
+  "status": "valid" | "invalid" | "rate_limited"
+}
+```
+
+---
+
+### 3. `get-keys`
+
+```json
+[
+  {
+    "id": "...",
+    "provider": "openai",
+    "status": "valid",
+    "is_active": true
+  }
+]
+```
+
+---
+
+### 4. `set-active-key`
+
+* Activate one key
+* Deactivate others (same provider)
+
+---
+
+### 5. `delete-key`
+
+* Remove DB record
+* Delete from Vault
+
+---
+
+### 6. `rotate-key`
+
+#### Flow
+
+1. Validate new key
+2. Store in Vault
+3. Replace old key
+4. Update status
+
+---
+
+## 🧪 API Key Validation Rules
+
+### MUST happen inside Edge Function
+
+### Behavior
+
+* Timeout: 5 seconds
+* Retry: 1 time
+
+### Status Mapping
+
+* `200` → `valid`
+* `401/403` → `invalid`
+* `429` → `rate_limited`
+
+---
+
+## ⚡ Performance Optimization
+
+### 🔥 Key Caching Layer
+
+* Cache keys in memory inside Edge Function
+* TTL: 5 minutes
+
+```ts
+cache[userId] = {
+  key,
+  expiresAt
+}
+```
+
+---
+
+## 🚦 Rate Limiting
+
+Apply on:
+
+### `add-key`
+
+* Max attempts per user (e.g. 5/min)
+
+### `validate-key`
+
+* Prevent abuse
 
 ---
 
 ## 🧠 Domain Layer
 
-Entity:
+### Entity
 
-- ProviderKey
-
-UseCases:
-
-- AddKey
-- GetKeys
-- SetActiveKey
-- DeleteKey
+```dart
+class ProviderKey {
+  final String id;
+  final String provider;
+  final String status;
+  final bool isActive;
+}
+```
 
 ---
 
-## 📌 Output
+### UseCases
 
-- Secure API key management system
+* AddKey
+* GetKeys
+* SetActiveKey
+* DeleteKey
+* RotateKey
+
+---
+
+## 📱 Presentation Layer
+
+### ProviderKeysCubit States
+
+* initial
+* loading
+* loaded
+* empty
+* error
+
+---
+
+## 🧩 UI Behavior
+
+* Show provider name
+
+* Show status:
+
+  * ✅ Valid
+  * ⚠️ Rate Limited
+  * ❌ Invalid
+
+* Allow:
+
+  * Add key
+  * Delete key
+  * Activate key
+
+---
+
+## ⚠️ Explicit Non-Goals
+
+❌ This phase does NOT include:
+
+* Provider resolution logic
+* Default provider (Pixazo)
+* Image generation logic
+
+👉 These belong to **Phase 6**
+
+---
+
+## 📌 Output of Phase 5
+
+* Secure API key storage (Vault)
+* Fully validated keys
+* Multi-provider support
+* Clean API for managing keys
+* No leakage of secrets
+
+---
+
+## 🎯 Ready for Spec Generation
+
+This phase is:
+
+* Deterministic
+* Modular
+* Backend-driven
+* Cleanly separated
 
 ---
 

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:creatix/core/constants/app_routes.dart';
 import '../cubit/auth_cubit.dart';
 import '../cubit/auth_state.dart';
 
@@ -47,6 +48,8 @@ class _RegisterPageState extends State<RegisterPage> {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(content: Text(state.message)),
             );
+          } else if (state is AuthAuthenticated) {
+            Navigator.pushReplacementNamed(context, AppRoutes.brands);
           }
         },
         builder: (context, state) {

@@ -24,25 +24,42 @@ void main() async {
 class CreatixApp extends StatelessWidget {
   const CreatixApp({super.key});
 
+ 
+
+
+
+
+  
+
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => getIt<AuthCubit>()..checkAuth(),
-      child: BlocBuilder<AuthCubit, AuthState>(
-        builder: (context, state) {
-          final isAuthenticated = state is AuthAuthenticated;
-
-          return MaterialApp(
-            title: AppConstants.appName,
-            debugShowCheckedModeBanner: false,
-            theme: ThemeData(
-              colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-              useMaterial3: true,
-            ),
-            initialRoute: isAuthenticated ? AppRoutes.brands : AppRoutes.login,
-            onGenerateRoute: AppRouter.generateRoute,
+      create: (_) => getIt<AuthCubit>()..checkAuth(),
+      child: BlocListener<AuthCubit, AuthState>(
+        listenWhen: (previous, current) =>
+            previous is AuthAuthenticated && current is AuthUnauthenticated,
+        listener: (context, state) {
+          Navigator.of(context).pushNamedAndRemoveUntil(
+            AppRoutes.login,
+            (_) => false,
           );
         },
+        child: BlocBuilder<AuthCubit, AuthState>(
+          builder: (context, state) {
+            final isAuthenticated = state is AuthAuthenticated;
+
+            return MaterialApp(
+              title: AppConstants.appName,
+              debugShowCheckedModeBanner: false,
+              theme: ThemeData(
+                colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+                useMaterial3: true,
+              ),
+              initialRoute: isAuthenticated ? AppRoutes.brands : AppRoutes.login,
+              onGenerateRoute: AppRouter.generateRoute,
+            );
+          },
+        ),
       ),
     );
   }

@@ -1,4 +1,5 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
+
 import '../models/brand_model.dart';
 
 abstract class BrandRemoteDataSource {
@@ -46,11 +47,7 @@ class BrandRemoteDataSourceImpl implements BrandRemoteDataSource {
   }) async {
     final response = await client
         .from('brands')
-        .insert({
-          'user_id': userId,
-          'name': name,
-          'logo_url': logoUrl,
-        })
+        .insert({'user_id': userId, 'name': name, 'logo_url': logoUrl})
         .select()
         .single();
     return BrandModel.fromJson(response);
@@ -64,10 +61,7 @@ class BrandRemoteDataSourceImpl implements BrandRemoteDataSource {
   }) async {
     final response = await client
         .from('brands')
-        .update({
-          'name': name,
-          'logo_url': logoUrl,
-        })
+        .update({'name': name, 'logo_url': logoUrl})
         .eq('id', id)
         .select()
         .single();

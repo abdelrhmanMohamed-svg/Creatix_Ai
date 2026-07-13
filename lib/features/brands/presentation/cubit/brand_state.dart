@@ -97,6 +97,7 @@ class UpdateBrandFormState extends BrandState {
   final String name;
   final String? logoUrl;
   final String? nameError;
+  final String? submissionError;
   final bool isSubmitting;
   final bool logoRemoved;
 
@@ -105,6 +106,7 @@ class UpdateBrandFormState extends BrandState {
     this.name = '',
     this.logoUrl,
     this.nameError,
+    this.submissionError,
     this.isSubmitting = false,
     this.logoRemoved = false,
     List<BrandEntity>? brands,
@@ -116,6 +118,7 @@ class UpdateBrandFormState extends BrandState {
         name,
         logoUrl,
         nameError,
+        submissionError,
         isSubmitting,
         logoRemoved,
         brands,
@@ -127,6 +130,7 @@ class UpdateBrandFormState extends BrandState {
     String? name,
     String? logoUrl,
     String? nameError,
+    String? submissionError,
     bool? isSubmitting,
     bool? logoRemoved,
     List<BrandEntity>? brands,
@@ -136,6 +140,7 @@ class UpdateBrandFormState extends BrandState {
       name: name ?? this.name,
       logoUrl: logoUrl ?? this.logoUrl,
       nameError: nameError,
+      submissionError: submissionError,
       isSubmitting: isSubmitting ?? this.isSubmitting,
       logoRemoved: logoRemoved ?? this.logoRemoved,
       brands: brands ?? this.brands,

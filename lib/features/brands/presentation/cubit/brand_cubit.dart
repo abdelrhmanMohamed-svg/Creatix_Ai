@@ -1,10 +1,13 @@
+import 'package:dartz/dartz.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:creatix/core/constants/storage_constants.dart';
+import 'package:creatix/core/error/failures.dart';
 import 'package:creatix/core/utils/validators.dart';
 import 'package:creatix/core/utils/error_handler.dart';
+import '../../domain/repositories/brand_storage_repository.dart';
 import '../../domain/usecases/get_brands.dart';
 import '../../domain/usecases/create_brand.dart';
 import '../../domain/usecases/update_brand.dart';
@@ -18,7 +21,10 @@ class BrandCubit extends Cubit<BrandState> {
   final UpdateBrand updateBrandUseCase;
   final DeleteBrand deleteBrandUseCase;
   final UploadBrandLogo uploadBrandLogoUseCase;
+  final BrandStorageRepository _storageRepository;
   final ImagePicker _imagePicker = ImagePicker();
+
+  String? _originalLogoUrl;
 
   BrandCubit({
     required this.getBrandsUseCase,
@@ -26,7 +32,9 @@ class BrandCubit extends Cubit<BrandState> {
     required this.updateBrandUseCase,
     required this.deleteBrandUseCase,
     required this.uploadBrandLogoUseCase,
-  }) : super(const BrandInitial());
+    required BrandStorageRepository storageRepository,
+  })  : _storageRepository = storageRepository,
+        super(const BrandInitial());
 
   SupabaseClient get _supabase => Supabase.instance.client;
 
@@ -41,6 +49,7 @@ class BrandCubit extends Cubit<BrandState> {
     required String name,
     String? logoUrl,
   }) {
+    _originalLogoUrl = logoUrl;
     emit(UpdateBrandFormState(
       brandId: brandId,
       name: name,
@@ -156,7 +165,22 @@ class BrandCubit extends Cubit<BrandState> {
         }
       }
 
-   
+      final createResult = await createBrandUseCase(
+        userId: userId,
+        name: currentState.name.trim(),
+        logoUrl: logoUrl,
+      );
+
+      final createSuccess = createResult.fold(
+        (failure) {
+          debugPrint('Brand creation failed: ${failure.message}');
+          emit(currentState.copyWith(isSubmitting: false));
+          return false;
+        },
+        (_) => true,
+      );
+
+      if (!createSuccess) return;
 
       debugPrint('Brand created successfully');
 
@@ -219,17 +243,25 @@ class BrandCubit extends Cubit<BrandState> {
         }
       }
 
-      await updateBrandUseCase(
+      if (logoUrl != null && _originalLogoUrl != null) {
+        await _storageRepository.deleteLogo(_originalLogoUrl!);
+        _originalLogoUrl = null;
+      }
+
+      final result = await updateBrandUseCase(
         id: currentState.brandId,
         name: currentState.name.trim(),
         logoUrl: currentState.logoRemoved ? null : logoUrl,
       );
 
-      final userId = _currentUserId;
-      final result = await getBrandsUseCase(userId ?? '');
       result.fold(
-        (failure) => emit(BrandError(failure.message)),
-        (brands) => emit(BrandLoaded(brands)),
+        (failure) {
+          emit(currentState.copyWith(
+              isSubmitting: false, submissionError: failure.message));
+        },
+        (_) {
+          emit(currentState.copyWith(isSubmitting: false));
+        },
       );
     } catch (e) {
       debugPrint('Error updating brand: $e');

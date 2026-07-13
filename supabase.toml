@@ -1,0 +1,44 @@
+[project]
+project_id = "ofcstcugqedludtmyver"
+org = "default"
+
+[api]
+enabled = true
+port = 54321
+schemas = ["public", "storage", "graphql_public"]
+extra_search_path = ["public", "extensions"]
+max_rows = 1000
+
+[db]
+port = 54322
+shadow_port = 54320
+major_version = 15
+
+[studio]
+enabled = true
+port = 54323
+
+[inbound_ip_policy]
+enabled = true
+
+[analytics]
+enabled = true
+port = 54325
+
+[vault]
+enabled = true
+
+[edge_function]
+enabled = true
+
+[edge_function.add-key]
+verify_jwt = false
+
+[edge_function.list-keys]
+verify_jwt = false
+
+[edge_function.activate-key]
+verify_jwt = false
+
+[edge_function.delete-key]
+verify_jwt = false

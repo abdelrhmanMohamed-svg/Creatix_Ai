@@ -1,24 +1,39 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:creatix/core/di/injection.dart';
 import '../../domain/entities/profile.dart';
 import '../cubit/profile_cubit.dart';
 import '../cubit/profile_state.dart';
 
-class EditProfilePage extends StatefulWidget {
+class EditProfilePage extends StatelessWidget {
   final Profile profile;
-  final ProfileCubit cubit;
 
   const EditProfilePage({
     super.key,
     required this.profile,
-    required this.cubit,
   });
 
   @override
-  State<EditProfilePage> createState() => _EditProfilePageState();
+  Widget build(BuildContext context) {
+    final cubit = getIt<ProfileCubit>();
+
+    return BlocProvider.value(
+      value: cubit,
+      child: _EditProfileForm(profile: profile),
+    );
+  }
 }
 
-class _EditProfilePageState extends State<EditProfilePage> {
+class _EditProfileForm extends StatefulWidget {
+  final Profile profile;
+
+  const _EditProfileForm({required this.profile});
+
+  @override
+  State<_EditProfileForm> createState() => _EditProfileFormState();
+}
+
+class _EditProfileFormState extends State<_EditProfileForm> {
   final _formKey = GlobalKey<FormState>();
   late final TextEditingController _fullNameController;
   late final TextEditingController _avatarUrlController;
@@ -39,7 +54,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
   void _onSave() {
     if (_formKey.currentState!.validate()) {
-      widget.cubit.updateProfile(
+      context.read<ProfileCubit>().updateProfile(
         fullName: _fullNameController.text.trim().isEmpty
             ? null
             : _fullNameController.text.trim(),
@@ -52,9 +67,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider.value(
-      value: widget.cubit,
-      child: BlocListener<ProfileCubit, ProfileState>(
+    return BlocListener<ProfileCubit, ProfileState>(
         listener: (context, state) {
           if (state is ProfileLoaded) {
             ScaffoldMessenger.of(context).showSnackBar(
@@ -130,7 +143,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
             );
           },
         ),
-      ),
     );
   }
 }

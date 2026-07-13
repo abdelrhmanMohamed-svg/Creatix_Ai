@@ -1,6 +1,6 @@
 ﻿# Creatix Development Guidelines
 
-Auto-generated from all feature plans. Last updated: 2026-04-19
+Auto-generated from all feature plans. Last updated: 2026-04-22
 
 ## Active Technologies
 - Flutter + Dart 3.x + flutter_bloc (Cubit), get_it, supabase_flutter, equatable, dartz (002-auth-profile)
@@ -26,9 +26,9 @@ tests/
 Dart 3.x (latest stable Flutter SDK): Follow standard conventions
 
 ## Recent Changes
+- 005-provider-keys: Added Dart 3.x (latest stable Flutter SDK) + Flutter, flutter_bloc (Cubit), get_it, supabase_flutter, equatable, dartz
 - 004-brand-kit-wizard: Added Dart 3.x (latest stable Flutter SDK) + Flutter, flutter_bloc (Cubit), get_it, supabase_flutter, equatable, dartz
 - 003-brands-system: Added Dart 3.x (latest stable Flutter SDK) + Flutter, flutter_bloc (Cubit), get_it, supabase_flutter, equatable, dartz
-- 002-auth-profile: Added Flutter + Dart 3.x + flutter_bloc (Cubit), get_it, supabase_flutter, equatable, dartz
 
 
 <!-- MANUAL ADDITIONS START -->

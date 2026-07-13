@@ -25,6 +25,10 @@ import 'package:creatix/features/brands/domain/usecases/upload_brand_logo.dart';
 import 'package:creatix/features/brand_kit_wizard/data/datasources/brand_kit_remote_data_source.dart';
 import 'package:creatix/features/brand_kit_wizard/data/repositories/brand_kit_repository_impl.dart';
 import 'package:creatix/features/brand_kit_wizard/domain/repositories/brand_kit_repository.dart';
+import 'package:creatix/features/provider_keys/data/datasources/provider_key_remote_data_source.dart';
+import 'package:creatix/features/provider_keys/data/repositories/provider_key_repository_impl.dart';
+import 'package:creatix/features/provider_keys/domain/repositories/provider_key_repository.dart';
+import 'package:creatix/features/provider_keys/presentation/cubit/provider_key_cubit.dart';
 import 'package:get_it/get_it.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -108,5 +112,19 @@ Future<void> setupDependencies() async {
   );
   getIt.registerLazySingleton<BrandKitRepository>(
     () => BrandKitRepositoryImpl(getIt<BrandKitRemoteDataSource>()),
+  );
+
+  getIt.registerLazySingleton<ProviderKeyRemoteDatasource>(
+    () => ProviderKeyRemoteDatasourceImpl(getIt<SupabaseClient>()),
+  );
+  getIt.registerLazySingleton<ProviderKeyRepository>(
+    () => ProviderKeyRepositoryImpl(getIt<ProviderKeyRemoteDatasource>()),
+  );
+
+  getIt.registerFactory<ProviderKeyCubit>(
+    () => ProviderKeyCubit(
+      repository: getIt<ProviderKeyRepository>(),
+      supabaseClient: getIt<SupabaseClient>(),
+    ),
   );
 }
