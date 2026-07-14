@@ -973,41 +973,470 @@ This phase is:
 
 ---
 
-# 🎨 Phase 6 — Image Generation System
-
-## 🎯 Goal
-
-AI-powered image generation with fallback provider system
+# 🎨 Phase 6 — AI Image Generation System
 
 ---
 
-## ⚙️ Flow
+# 🎯 Goal
 
-Flutter → Edge Function → Provider Resolver → AI Provider → Response
+Build a secure, scalable, AI-powered image generation system that enables users to create branded marketing images using multiple AI providers through a unified backend pipeline.
 
----
-
-## 🧠 Provider Logic
-
-- If user key exists → OpenAI / Gemini
-- If not → Pixazo (free tier)
+The Flutter application never communicates directly with AI providers. All image generation requests are handled through Supabase Edge Functions.
 
 ---
 
-## 📱 Flutter Role
+# ✨ Objectives
 
-ONLY:
+This phase introduces a complete AI image generation workflow that:
 
-- Send request
-- Show loading state
-- Render image result
+- Generates high-quality marketing images
+- Supports multiple AI providers
+- Automatically selects the appropriate provider
+- Builds optimized prompts based on brand identity
+- Stores generated images securely
+- Tracks every generation for analytics and future features
 
 ---
 
-## 📌 Output
+# 📌 Scope
 
-- Full AI generation pipeline working
+## ✅ Included
 
+- AI image generation
+- Prompt submission
+- Brand selection
+- Platform presets
+- Style selection
+- Aspect ratio selection
+- Quality selection
+- Prompt Builder
+- Provider Resolution
+- Image storage
+- Generation tracking
+- Retry mechanism
+- Error handling
+
+---
+
+## ❌ Excluded
+
+- Generation history
+- Favorites
+- Image editing
+- Background removal
+- Image variations
+- Upscaling
+- AI Chat
+- Video generation
+- Batch generation
+
+---
+
+# 🏗 System Overview
+
+The generation flow is designed around a secure backend-first architecture.
+
+```
+Flutter
+
+↓
+
+Supabase Edge Function
+
+↓
+
+Generation Service
+
+↓
+
+Provider Resolver
+
+↓
+
+Prompt Builder
+
+↓
+
+AI Provider
+
+↓
+
+Supabase Storage
+
+↓
+
+Database
+
+↓
+
+Flutter Response
+```
+
+---
+
+# 👤 User Journey
+
+```
+Select Brand
+
+↓
+
+Select Platform
+
+↓
+
+Write Prompt
+
+↓
+
+(Optional) Add Negative Prompt
+
+↓
+
+Select Style
+
+↓
+
+Select Aspect Ratio
+
+↓
+
+Select Quality
+
+↓
+
+Generate Image
+
+↓
+
+View Result
+```
+
+---
+
+# 🧠 Core Features
+
+## 🎨 Prompt Builder
+
+Automatically transforms user input into a complete AI prompt by combining:
+
+- Brand Identity
+- Brand Tone
+- Brand Description
+- Target Audience
+- Brand Colors
+- Platform Preset
+- Selected Style
+- User Prompt
+
+---
+
+## 🔑 Provider Resolution
+
+Automatically selects the most suitable provider.
+
+Priority:
+
+```
+User Active Provider
+
+↓
+
+Configured AI Providers
+
+↓
+
+Default Provider
+```
+
+Users never choose the provider manually.
+
+---
+
+## 🖼 AI Image Generation
+
+Supports generating branded marketing assets optimized for different social platforms.
+
+Every generation includes:
+
+- Optimized Prompt
+- Selected Style
+- Aspect Ratio
+- Quality Level
+- Provider Metadata
+
+---
+
+## ☁ Secure Storage
+
+Generated images are automatically uploaded to Supabase Storage.
+
+Each generation is linked to:
+
+- User
+- Brand
+- Provider
+- Prompt
+- Generated Image
+
+---
+
+## 📊 Generation Tracking
+
+Every generation is recorded for future features such as:
+
+- Analytics
+- History
+- Favorites
+- Regeneration
+- Usage Statistics
+
+---
+
+# 🎯 Platform Presets
+
+Supported presets include:
+
+- Instagram Post
+- Instagram Story
+- Facebook Post
+- LinkedIn Post
+- Twitter/X Post
+- Pinterest Pin
+- YouTube Thumbnail
+
+Each preset defines:
+
+- Recommended dimensions
+- Default aspect ratio
+- Prompt template
+- Output resolution
+
+---
+
+# 🎨 Generation Styles
+
+Supported styles:
+
+- Photorealistic
+- Illustration
+- Minimal
+- Flat Design
+- Luxury
+- Cartoon
+- 3D
+- Sketch
+- Watercolor
+
+---
+
+# 📐 Aspect Ratios
+
+Supported formats:
+
+- 1:1
+- 4:5
+- 3:4
+- 16:9
+- 9:16
+
+---
+
+# ⚡ Quality Levels
+
+Available options:
+
+- Fast
+- Balanced
+- High
+
+---
+
+# 🔄 Generation Workflow
+
+```
+User Input
+
+↓
+
+Validation
+
+↓
+
+Build Prompt
+
+↓
+
+Resolve Provider
+
+↓
+
+Generate Image
+
+↓
+
+Upload Image
+
+↓
+
+Save Metadata
+
+↓
+
+Return Result
+```
+
+---
+
+# 🛡 Security Principles
+
+The system is designed with security as a first-class concern.
+
+Key principles include:
+
+- No API Keys inside Flutter
+- Backend-only provider communication
+- Ownership validation
+- RLS protection
+- Secure image storage
+- Request validation
+
+---
+
+# 📱 Flutter Responsibilities
+
+Flutter is responsible for:
+
+- Collecting user input
+- Validating form fields
+- Calling the generation endpoint
+- Displaying loading states
+- Showing generated images
+- Displaying errors
+
+Flutter never:
+
+- Builds prompts
+- Resolves providers
+- Calls AI providers directly
+- Stores provider credentials
+
+---
+
+# 🚨 Error Handling
+
+The system gracefully handles:
+
+- Invalid prompt
+- Missing brand
+- Invalid provider
+- Timeout
+- Invalid API key
+- Storage failure
+- Network issues
+- Unknown errors
+
+---
+
+# 🔄 Retry Strategy
+
+Automatic retry is supported for temporary failures.
+
+Retry applies to:
+
+- Provider timeout
+- Temporary provider unavailability
+
+Retry does not apply to:
+
+- Validation errors
+- Invalid credentials
+- Unauthorized requests
+
+---
+
+# ⏳ User Experience
+
+During generation, users receive clear progress feedback.
+
+Typical stages include:
+
+- Preparing Prompt
+- Resolving Provider
+- Generating Image
+- Uploading Image
+- Saving Generation
+
+---
+
+# 📈 Analytics
+
+Generation metrics include:
+
+- Provider usage
+- Success rate
+- Failure reasons
+- Generation duration
+- Default provider usage
+
+---
+
+# 🚀 Performance Goals
+
+The generation system should provide:
+
+- Fast response times
+- Optimized image uploads
+- Efficient caching
+- Low memory usage
+- Single backend request per generation
+
+---
+
+# 🔮 Future Expansion
+
+The architecture is intentionally designed to support future AI capabilities without major refactoring.
+
+Planned extensions include:
+
+- Multiple image generation
+- Regenerate image
+- AI image editing
+- Background removal
+- Upscaling
+- AI captions
+- AI marketing assistant
+- AI chat
+- Video generation
+
+---
+
+# ✅ Deliverables
+
+At the end of this phase, the application should provide:
+
+- Complete AI image generation workflow
+- Secure backend integration
+- Multi-provider support
+- Prompt optimization
+- Image storage
+- Generation tracking
+- Robust error handling
+- Production-ready architecture
+
+---
+
+# 📌 Next Phase
+
+The next phase will focus on defining the complete technical implementation, including:
+
+- Edge Function contracts
+- Provider Adapter architecture
+- Prompt Builder rules
+- Database relationships
+- Storage strategy
+- Testing strategy
+- API specifications
 ---
 
 # 🕓 Phase 7 — History System
